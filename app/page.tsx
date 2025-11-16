@@ -425,7 +425,7 @@ export default function LoanCalculatorPage() {
                   />
                 </svg>
                 <p className="mt-4 text-sm sm:text-base text-gray-500 px-4">
-                  Enter loan details and click "Calculate Loan" to see results
+                  Enter loan details and click &quot;Calculate Loan&quot; to see results
                 </p>
               </div>
             )}
@@ -438,7 +438,7 @@ export default function LoanCalculatorPage() {
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 mb-4">
               <h2 className="flex items-start text-xl sm:text-2xl font-semibold text-gray-800">
                 <span className="flex-1">Amortization Schedule</span>
-                <InfoTooltip explanation={<>This table shows exactly where every rupee of your EMI goes. Your EMI is split into two parts: <strong>Interest</strong> (the bank's profit) and <strong>Principal</strong> (what pays down your actual loan).<br /><br />- At the start, most of your EMI pays for <strong>Interest</strong>.<br />- As your loan balance gets smaller, the <strong>Interest</strong> part decreases and the <strong>Principal</strong> part increases.<br />- The <strong>Closing Balance</strong> shows your remaining loan after each payment.</>} />
+                <InfoTooltip explanation={<>This table shows exactly where every rupee of your EMI goes. Your EMI is split into two parts: <strong>Interest</strong> (the bank&apos;s profit) and <strong>Principal</strong> (what pays down your actual loan).<br /><br />- At the start, most of your EMI pays for <strong>Interest</strong>.<br />- As your loan balance gets smaller, the <strong>Interest</strong> part decreases and the <strong>Principal</strong> part increases.<br />- The <strong>Closing Balance</strong> shows your remaining loan after each payment.</>} />
               </h2>
               <button
                 onClick={downloadExcel}
