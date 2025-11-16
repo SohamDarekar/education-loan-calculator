@@ -113,54 +113,44 @@ export default function LoanCalculatorPage() {
     // Step 5: Calculate monthly disposable income
     const monthlyDisposableIncome = annualSalary / 12 - monthlyExpenses;
 
-    // Step 6: Generate amortization schedule
-    const schedule: AmortizationRow[] = [];
-    let balance = newPrincipal;
-    let month = 1;
-
-    while (balance > 0.01) {
-      const interestForMonth = balance * monthlyRate;
-      const principalForMonth = Math.min(emi - interestForMonth, balance);
-      const actualEMI = interestForMonth + principalForMonth;
-      const newBalance = balance - principalForMonth;
-
-      schedule.push({
-        month,
-        openingBalance: balance,
-        emi: actualEMI,
-        principalPaid: principalForMonth,
-        interestPaid: interestForMonth,
-        closingBalance: Math.max(newBalance, 0),
-      });
-
-      balance = newBalance;
-      month++;
-
-      // Safety break to prevent infinite loops
-      if (month > 1000) break;
-    }
-
-    setAmortizationSchedule(schedule);
-
-    // Step 7: Calculate actual repayment time based on disposable income
+    // Step 6 & 7: Calculate actual repayment time AND generate schedule based on disposable income
+    const actualSchedule: AmortizationRow[] = [];
     let actualBalance = newPrincipal;
     let actualMonths = 0;
 
     if (monthlyDisposableIncome > 0) {
       while (actualBalance > 0.01) {
         const interestForMonth = actualBalance * monthlyRate;
+
+        // Check if disposable income can cover the interest
+        if (monthlyDisposableIncome <= interestForMonth && actualMonths === 0) {
+          setActualRepaymentTime(-1); // Cannot afford
+          setAmortizationSchedule([]); // Clear schedule
+          return; // Exit calculation
+        }
+
         const principalForMonth = Math.min(
           monthlyDisposableIncome - interestForMonth,
           actualBalance
         );
+        
+        // The actual payment is the full disposable income, unless it's the final payment
+        const actualPayment = (actualBalance - principalForMonth < 0.01) 
+                              ? (actualBalance + interestForMonth) 
+                              : (principalForMonth + interestForMonth);
+        
+        const newBalance = actualBalance - principalForMonth;
 
-        if (principalForMonth <= 0) {
-          // Cannot afford to pay even the interest
-          setActualRepaymentTime(-1);
-          return;
-        }
+        actualSchedule.push({
+          month: actualMonths + 1,
+          openingBalance: actualBalance,
+          emi: actualPayment, // This column now shows the disposable income payment
+          principalPaid: principalForMonth,
+          interestPaid: interestForMonth,
+          closingBalance: Math.max(newBalance, 0),
+        });
 
-        actualBalance -= principalForMonth;
+        actualBalance = newBalance;
         actualMonths++;
 
         // Safety break
@@ -168,8 +158,10 @@ export default function LoanCalculatorPage() {
       }
 
       setActualRepaymentTime(actualMonths / 12);
+      setAmortizationSchedule(actualSchedule); // Set the new "actual" schedule
     } else {
       setActualRepaymentTime(-1);
+      setAmortizationSchedule([]); // Clear schedule
     }
   };
 
